@@ -1,4 +1,7 @@
-# Marketo Code Challenge
+# Lead Cleaner
+
+This is a simple application that de-duplicates a list of lead entries from disk, based on specific criteria.
+This project was developed in .NET 2.0 and uses Unity as a front end.
 
 ## Getting Started
 
