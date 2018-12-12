@@ -6,6 +6,8 @@ using NUnit.Framework;
 using Newtonsoft.Json;
 using UnityEngine;
 
+
+
 public class Lead
 {
     public string Id;
@@ -15,6 +17,12 @@ public class Lead
     public string Address;
     public DateTime EntryDate;
 }
+
+public class LeadContainer
+{
+    public List<Lead> Leads;
+}
+
 
 public class LeadCleaner : MonoBehaviour
 {
@@ -31,23 +39,23 @@ public class LeadCleaner : MonoBehaviour
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error reading file:");
-            Console.WriteLine(e.Message);
+            Debug.Log("Error reading file:");
+            Debug.Log(e.Message);
         }
 
         return null;
     }
 
-    public List<Lead> DeserializeJson(string json)
+    public LeadContainer DeserializeJson(string json)
     {
         try
         {
-            return JsonConvert.DeserializeObject<List<Lead>>(json);
+            return JsonConvert.DeserializeObject<LeadContainer>(json);
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error deseralizing data:");
-            Console.WriteLine(e.Message);
+            Debug.Log("Error deseralizing data:");
+            Debug.Log(e.Message);
         }
 
         return null;
@@ -58,7 +66,7 @@ public class LeadCleaner : MonoBehaviour
     [Test]
     public void LoadJsonFromDiskTest()
     {
-        string json = LoadJsonFromDisk(Application.dataPath + "leads.json");
+        string json = LoadJsonFromDisk(Application.dataPath + "\\leads.json");
 
         Assert.That(string.IsNullOrEmpty(json), Is.False);
     }
@@ -66,11 +74,10 @@ public class LeadCleaner : MonoBehaviour
     [Test]
     public void DeserializeJsonTest()
     {
-        List<Lead> leads = new List<Lead>();
-        string json = LoadJsonFromDisk(Application.dataPath + "leads.json");
-        leads = DeserializeJson(json);
+        string json = LoadJsonFromDisk(Application.dataPath + "\\leads.json");
+        LeadContainer leads = DeserializeJson(json);
 
-        Assert.That(string.IsNullOrEmpty(json), Is.False);
+        Assert.That(leads, !Is.Null);
     }
 
     #endregion
