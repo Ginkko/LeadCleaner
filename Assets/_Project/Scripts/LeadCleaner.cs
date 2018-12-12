@@ -6,27 +6,23 @@ using NUnit.Framework;
 using Newtonsoft.Json;
 using UnityEngine;
 
-
-
 public class Lead
 {
-    public string Id;
-    public string Email;
-    public string FirstName;
-    public string LastName;
-    public string Address;
-    public DateTime EntryDate;
+    public string _id;
+    public string email;
+    public string firstName;
+    public string lastName;
+    public string address;
+    public DateTime entryDate;
 }
 
 public class LeadContainer
 {
-    public List<Lead> Leads;
+    public List<Lead> leads;
 }
-
 
 public class LeadCleaner : MonoBehaviour
 {
-
     private string LoadJsonFromDisk(string path)
     {
         try
@@ -46,7 +42,7 @@ public class LeadCleaner : MonoBehaviour
         return null;
     }
 
-    public LeadContainer DeserializeJson(string json)
+    private LeadContainer DeserializeJson(string json)
     {
         try
         {
@@ -59,6 +55,11 @@ public class LeadCleaner : MonoBehaviour
         }
 
         return null;
+    }
+
+    private LeadContainer CleanLeadsById(LeadContainer leadContainer)
+    {
+        return leadContainer;
     }
 
     #region Tests
@@ -75,9 +76,34 @@ public class LeadCleaner : MonoBehaviour
     public void DeserializeJsonTest()
     {
         string json = LoadJsonFromDisk(Application.dataPath + "\\leads.json");
-        LeadContainer leads = DeserializeJson(json);
+        LeadContainer leadContainer = DeserializeJson(json);
 
-        Assert.That(leads, !Is.Null);
+        Assert.That(leadContainer.leads[0], !Is.Null);
+    }
+
+    [Test]
+    public void CleanLeadsByIdTest()
+    {
+        string json = LoadJsonFromDisk(Application.dataPath + "\\leads.json");
+        LeadContainer leadContainer = DeserializeJson(json);
+
+        leadContainer = CleanLeadsById(leadContainer);
+
+        bool duplicateExists = false;
+
+        for (int i = 0; i < leadContainer.leads.Count; i++)
+        {
+            for (int j = i + 1; j < leadContainer.leads.Count; j++)
+            {
+                if (leadContainer.leads[i]._id == leadContainer.leads[j]._id)
+                {
+                    Debug.LogFormat("Duplicate found [{0}]: {1}, [{2}]: {3}", i, leadContainer.leads[i]._id, j, leadContainer.leads[j]._id);
+                    duplicateExists = true;
+                }
+            }
+        }
+
+        Assert.That(duplicateExists, Is.False);
     }
 
     #endregion
