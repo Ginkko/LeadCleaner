@@ -23,6 +23,20 @@ public class LeadContainer
 
 public class LeadCleaner : MonoBehaviour
 {
+    
+    public List<Lead> CleanLeads(string inputPath, string outputPath)
+    {
+        string json = LoadJsonFromDisk(inputPath);
+        LeadContainer leadContainer = DeserializeJson(json);
+
+        List<Lead> leads = CleanLeads(leadContainer);
+
+        leadContainer.leads = leads;
+        WriteJsonToDisk(SerializeLeads(leadContainer), outputPath);
+
+        return leads;
+    }
+
     private string LoadJsonFromDisk(string path)
     {
         try
@@ -30,6 +44,7 @@ public class LeadCleaner : MonoBehaviour
             using (StreamReader sr = new StreamReader(path))
             {
                 string json = sr.ReadToEnd();
+                sr.Close();
                 return json;
             }
         }
@@ -42,6 +57,23 @@ public class LeadCleaner : MonoBehaviour
         return null;
     }
 
+    private void WriteJsonToDisk(string json, string path)
+    {
+        try
+        {
+            using (StreamWriter sw = new StreamWriter(path))
+            {
+                sw.Write(json);
+                sw.Close();
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Error writing file:");
+            Debug.Log(e.Message);
+        }
+    }
+
     private LeadContainer DeserializeJson(string json)
     {
         try
@@ -51,6 +83,21 @@ public class LeadCleaner : MonoBehaviour
         catch (Exception e)
         {
             Debug.Log("Error deseralizing data:");
+            Debug.Log(e.Message);
+        }
+
+        return null;
+    }
+
+    private string SerializeLeads(LeadContainer leadContainer)
+    {
+        try
+        {
+            return JsonConvert.SerializeObject(leadContainer);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Error serializing data:");
             Debug.Log(e.Message);
         }
 
@@ -107,24 +154,45 @@ public class LeadCleaner : MonoBehaviour
     [Test]
     public void LoadJsonFromDiskTest()
     {
-        string json = LoadJsonFromDisk(Application.dataPath + "\\leads.json");
+        string json = LoadJsonFromDisk(Application.streamingAssetsPath + "\\leads.json");
 
         Assert.That(string.IsNullOrEmpty(json), Is.False);
     }
 
     [Test]
+    public void WriteJsonToDiskTest()
+    {
+        string json = LoadJsonFromDisk(Application.streamingAssetsPath + "\\leads.json");
+        WriteJsonToDisk(json, Application.streamingAssetsPath + "\\testWrite.json");
+
+        Assert.That(File.Exists(Application.streamingAssetsPath + "\\testWrite.json"));
+
+        File.Delete(Application.streamingAssetsPath + "\\testWrite.json");
+    }
+
+    [Test]
     public void DeserializeJsonTest()
     {
-        string json = LoadJsonFromDisk(Application.dataPath + "\\leads.json");
+        string json = LoadJsonFromDisk(Application.streamingAssetsPath + "\\leads.json");
         LeadContainer leadContainer = DeserializeJson(json);
 
         Assert.That(leadContainer.leads[0], !Is.Null);
     }
 
     [Test]
+    public void SerailizeLeadsTest()
+    {
+        string json = LoadJsonFromDisk(Application.streamingAssetsPath + "\\leads.json");
+        LeadContainer leadContainer = DeserializeJson(json);
+        string serialiedJson = SerializeLeads(leadContainer);
+
+        Assert.That(string.IsNullOrEmpty(serialiedJson), Is.False);
+    }
+
+    [Test]
     public void CleanLeadsByIdTest()
     {
-        string json = LoadJsonFromDisk(Application.dataPath + "\\leads.json");
+        string json = LoadJsonFromDisk(Application.streamingAssetsPath + "\\leads.json");
         LeadContainer leadContainer = DeserializeJson(json);
 
         List<Lead> leads = CleanLeads(leadContainer);
@@ -149,7 +217,7 @@ public class LeadCleaner : MonoBehaviour
     [Test]
     public void CleanLeadsByEmailTest()
     {
-        string json = LoadJsonFromDisk(Application.dataPath + "\\leads.json");
+        string json = LoadJsonFromDisk(Application.streamingAssetsPath + "\\leads.json");
         LeadContainer leadContainer = DeserializeJson(json);
 
         List<Lead> leads = CleanLeads(leadContainer);
