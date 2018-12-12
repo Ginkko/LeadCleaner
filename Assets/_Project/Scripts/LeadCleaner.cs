@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class Lead
@@ -17,14 +18,6 @@ public class Lead
 
 public class LeadCleaner : MonoBehaviour
 {
-
-    public List<Lead> DeDuplicateLeads(string jsonPath)
-    {
-        List<Lead> leads = new List<Lead>();
-
-
-        return leads;
-    }
 
     private string LoadJsonFromDisk(string path)
     {
@@ -45,12 +38,38 @@ public class LeadCleaner : MonoBehaviour
         return null;
     }
 
+    public List<Lead> DeserializeJson(string json)
+    {
+        try
+        {
+            return JsonConvert.DeserializeObject<List<Lead>>(json);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error deseralizing data:");
+            Console.WriteLine(e.Message);
+        }
+
+        return null;
+    }
+
     #region Tests
 
     [Test]
     public void LoadJsonFromDiskTest()
     {
         string json = LoadJsonFromDisk(Application.dataPath + "leads.json");
+
+        Assert.That(string.IsNullOrEmpty(json), Is.False);
+    }
+
+    [Test]
+    public void DeserializeJsonTest()
+    {
+        List<Lead> leads = new List<Lead>();
+        string json = LoadJsonFromDisk(Application.dataPath + "leads.json");
+        leads = DeserializeJson(json);
+
         Assert.That(string.IsNullOrEmpty(json), Is.False);
     }
 
