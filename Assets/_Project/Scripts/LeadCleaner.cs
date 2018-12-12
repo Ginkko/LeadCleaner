@@ -2,9 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using NUnit.Framework;
 using Newtonsoft.Json;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using NUnit.Framework;
+#endif
 
 public class Lead
 {
@@ -23,7 +26,7 @@ public class LeadContainer
 
 public class LeadCleaner : MonoBehaviour
 {
-    
+
     public List<Lead> CleanLeads(string inputPath, string outputPath)
     {
         string json = LoadJsonFromDisk(inputPath);
@@ -151,6 +154,8 @@ public class LeadCleaner : MonoBehaviour
 
     #region Tests
 
+    #if UNITY_EDITOR
+
     [Test]
     public void LoadJsonFromDiskTest()
     {
@@ -238,6 +243,7 @@ public class LeadCleaner : MonoBehaviour
 
         Assert.That(duplicateExists, Is.False);
     }
+    #endif
 
     #endregion
 }

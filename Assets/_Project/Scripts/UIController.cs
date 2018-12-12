@@ -19,15 +19,18 @@ public class UIController : MonoBehaviour
     [SerializeField]
     private Button cleanButton;
     [SerializeField]
+    private Button quitButton;
+    [SerializeField]
     private LeadCleaner leadCleaner;
-	[SerializeField]
-	private GameObject leadVizPrefab;
-	[SerializeField]
-	private Transform leadRegion;
+    [SerializeField]
+    private GameObject leadVizPrefab;
+    [SerializeField]
+    private Transform leadRegion;
 
     private void Awake()
     {
-		cleanButton.onClick.AddListener(OnCleanButton);
+        cleanButton.onClick.AddListener(OnCleanButton);
+        quitButton.onClick.AddListener(OnQuitButton);
     }
     private void Start()
     {
@@ -37,14 +40,19 @@ public class UIController : MonoBehaviour
 
     private void OnCleanButton()
     {
-		List<Lead> leads = leadCleaner.CleanLeads(LoadPath.text, WritePath.text);
-		foreach (Lead lead in leads)
-		{
-			GameObject go = Instantiate(leadVizPrefab);
-			go.transform.SetParent(leadRegion);
-			go.transform.localScale = Vector3.one;
-			LeadViz leadViz = go.GetComponent<LeadViz>();
-			leadViz.Initialize(lead);
-		}
+        List<Lead> leads = leadCleaner.CleanLeads(LoadPath.text, WritePath.text);
+        foreach (Lead lead in leads)
+        {
+            GameObject go = Instantiate(leadVizPrefab);
+            go.transform.SetParent(leadRegion);
+            go.transform.localScale = Vector3.one;
+            LeadViz leadViz = go.GetComponent<LeadViz>();
+            leadViz.Initialize(lead);
+        }
     }
+
+	private void OnQuitButton()
+	{
+		Application.Quit();
+	}
 }
